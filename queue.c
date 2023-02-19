@@ -133,6 +133,18 @@ int q_size(struct list_head *head)
     return nums;
 }
 
+struct list_head *list_get_mid_node(struct list_head *head)
+{
+    struct list_head *fast = head->next;
+    struct list_head *slow = head->next;
+
+    for (; fast != head && fast->next != head; fast = fast->next->next) {
+        slow = slow->next;
+    }
+
+    return slow;
+}
+
 /* Delete the middle node in queue */
 bool q_delete_mid(struct list_head *head)
 {
@@ -145,17 +157,8 @@ bool q_delete_mid(struct list_head *head)
         return true;
     }
 
-    int mid_index = q_size(head) / 2;
-    struct list_head *node, *safe;
-    list_for_each_safe (node, safe, head) {
-        if (mid_index == 0) {
-            list_del_init(node);
-            return true;
-        }
-        mid_index--;
-    }
-
-    return false;
+    list_del_init(list_get_mid_node(head));
+    return true;
 }
 
 /* Delete all nodes that have duplicate string */
