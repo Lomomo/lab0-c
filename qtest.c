@@ -686,7 +686,11 @@ static bool do_dm(int argc, char *argv[])
         ok = q_delete_mid(current->q);
     exception_cancel();
 
-    current->size--;
+    if (!current->size)
+        report(3, "Warning: Try to delete middle node to empty queue");
+
+    if (current->size)
+        --current->size;
     q_show(3);
     return ok && !error_check();
 }
@@ -1055,7 +1059,6 @@ static void q_init()
 
 static bool q_quit(int argc, char *argv[])
 {
-    return true;
     report(3, "Freeing queue");
     if (current && current->size > BIG_LIST_SIZE)
         set_cautious_mode(false);
