@@ -22,17 +22,22 @@ struct list_head *q_new()
     return head;
 }
 
+void q_free_element(element_t *entry)
+{
+    free(entry->value);
+    free(entry);
+}
+
 /* Free all storage used by queue */
 void q_free(struct list_head *l)
 {
     if (!l) {
         return;
     }
-    struct list_head *node, *safe;
-    list_for_each_safe (node, safe, l) {
-        element_t *e = list_entry(node, element_t, list);
-        free(e->value);
-        free(e);
+
+    element_t *entry, *safe;
+    list_for_each_entry_safe (entry, safe, l, list) {
+        q_free_element(entry);
     }
     free(l);
 }
@@ -152,12 +157,9 @@ bool q_delete_mid(struct list_head *head)
         return false;
     }
 
-    if (list_is_singular(head)) {
-        list_del_init(head->next);
-        return true;
-    }
-
-    list_del_init(list_get_mid_node(head));
+    struct list_head *node = list_get_mid_node(head);
+    list_del_init(node);
+    q_free_element(list_entry(node, element_t, list));
     return true;
 }
 
